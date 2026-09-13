@@ -1,0 +1,471 @@
+:root {
+    --card-border: #1565C0;
+    --card-background: #E8F0FE;
+    --white: #fff;
+    --white2: #f8fafc;
+    --light-gray: #b0b0b0;
+    --light-gray2: #d1d9e6;
+    --light-gray3: #94a3b8;
+    --gray: #343A40;
+    --dark-gray: #222;
+    --dark-purple: #4C1D95;
+    --light-purple: #A78BFA;
+    --purple: #7C3AED;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    height: 100%;
+    padding: 20px;
+}
+
+.graph_wrapper {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    margin-right: 20px;
+}
+
+.graph_container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+}
+
+.graph_container svg {
+    position: absolute;
+}
+
+#dataset_axes {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#rects_container {
+    position: absolute;
+}
+
+#lines_container {
+    pointer-events: none;
+    position: absolute;
+}
+
+.dataset_point {
+    transition: r 0.3s;
+}
+
+.dataset_point:hover {
+    r: 4;
+}
+
+.tree_wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+    background: var(--white);
+    height: 100%;
+    flex: 1;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+}
+
+.tree_settings {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    border: 1px solid var(--card-border);
+    /* border-right: 1px solid var(--card-border);
+    border-top: 1px solid var(--card-border); */
+    border-radius: 4px 4px 4px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tree_settings_row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Сам чекбокс */
+.checkbox {
+    /* Убираем нативный вид */
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    flex: 0 0 auto;
+    background-color: #fff;
+    border: 1px solid var(--dark-gray);
+    border-radius: 0px;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 90% 90%;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Ховер/фокус — только рамка, фон остаётся белым */
+.checkbox:hover {
+    border-color: #666;
+}
+
+.checkbox:focus-visible {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.25);
+}
+
+/* Отмеченное состояние: белый фон + SVG-галочка */
+.checkbox:checked {
+    background-color: #fff; /* фон не меняется */
+    border-color: #333;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M2.5 8.5 L6.5 12.5 L13.5 4' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+/* Неактивный чекбокс */
+.checkbox:disabled {
+    cursor: not-allowed;
+    border-color: #ccc;
+    background-color: #fff;
+}
+
+.checkbox:disabled:checked {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M2.5 8.5 L6.5 12.5 L13.5 4' fill='none' stroke='%23bbb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.rect-node {
+    cursor: pointer;
+    stroke-width: 1px;
+    stroke: var(--light-gray3);
+    transition: 0.3s;
+}
+.rect-node-unpainted {
+    fill: var(--white);
+}
+.rect-node:hover {
+    stroke: var(--dark-gray);
+}
+.rect-node-unpainted:hover {
+    fill: var(--purple);
+}
+.rect-node.selected {
+    stroke: var(--dark-purple);
+}
+.node-text {
+    pointer-events: none;
+    user-select: none;
+    font-weight: 600;
+    fill: var(--dark-gray);
+    transition: 0.3s;
+}
+.edge-line {
+    stroke: var(--light-gray);
+}
+
+.flex-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Каждая строка — flex-контейнер */
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    width: 100%;
+}
+
+.list-item:first-child {
+    padding-top: 0px;
+}
+
+.list-item.bd {
+    border-bottom: 1px solid #d0d7de;
+}
+
+#non-leaf-items {
+    padding-top: 8px;
+    border-top: 1px solid #d0d7de;
+}
+
+/* Наименование слева */
+.label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--dark-gray);
+    letter-spacing: 0.01em;
+}
+
+/* Значение справа — выделено цветом */
+.value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--card-border);      /* основной цвет значения */
+    background: var(--card-background);  /* лёгкий фон для акцента (опционально) */
+    padding: 0.15rem 0.6rem;
+    border-radius: 30px;
+}
+
+.settings_wrapper {
+    display: none;
+}
+
+.toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+    flex-shrink: 0;
+}
+
+.toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #cbd5e1;
+    border-radius: 28px;
+    transition: all 0.3s ease;
+}
+
+.toggle .slider::before {
+    content: "";
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle input:checked + .slider {
+    background: #1A73E8;
+}
+
+.toggle input:checked + .slider::before {
+    transform: translateX(22px);
+}
+
+/* Hover эффект */
+.toggle:hover .slider {
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+}
+
+/* ===== МАЛЕНЬКИЙ TOGGLE ===== */
+.toggle-sm {
+    width: 36px;
+    height: 20px;
+}
+
+.toggle-sm .slider::before {
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+}
+
+.toggle-sm input:checked + .slider::before {
+    transform: translateX(16px);
+}
+
+.custom-select {
+    padding: 4px 28px 4px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--card-border);
+    background-color: #E8F0FE;
+    border: 2px solid var(--card-border);
+    border-radius: 6px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(21, 101, 192, 0.15);
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231565C0' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 18px;
+}
+
+.custom-select:hover {
+    background-color: #dce8fc;
+    box-shadow: 0 6px 20px rgba(21, 101, 192, 0.25);
+}
+
+.custom-select:focus {
+    border-color: #0d47a1;
+    box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.25);
+    background-color: #ffffff;
+}
+
+.custom-select option {
+    background-color: #ffffff;
+    color: var(--card-border);
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.custom-select option:checked {
+    background: var(--card-border);
+    color: #ffffff;
+}
+
+.custom-select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 var(--card-border);
+}
+
+.custom-select::-webkit-listbox {
+    background-color: #E8F0FE;
+    border-radius: 10px;
+    border: 2px solid var(--card-border);
+    padding: 4px;
+}
+
+.custom-select::-webkit-listbox option {
+    border-radius: 6px;
+    padding: 6px 12px;
+    margin: 2px 0;
+    transition: 0.2s;
+}
+
+.custom-select::-webkit-listbox option:checked {
+    background: var(--card-border) !important;
+    color: #ffffff !important;
+}
+
+.custom-select::-webkit-listbox option:hover {
+    background: var(--card-border) !important;
+    color: #ffffff !important;
+}
+
+.dataset_line {
+    stroke: var(--gray);
+    stroke-width: 2px;
+    pointer-events: none;
+}
+
+.dataset_line_movable {
+    stroke: var(--purple);
+    stroke-width: 4px;
+    pointer-events: all;
+}
+
+.dataset_line_movable.movable_X {
+    cursor: col-resize;
+}
+.dataset_line_movable.movable_Y {
+    cursor: row-resize;
+}
+
+.dataset_line_movable:hover {
+    stroke: var(--dark-purple);
+}
+
+.graph_setting, .paint_panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    width: 100%;
+}
+
+.paint_panel {
+    display: none;
+}
+
+.paint_panel button {
+    background: var(--white);
+    border: 1px solid var(--light-gray2);
+    border-radius: 4px;
+    padding: 0.4rem 0.8rem 0.4rem 0.8rem;
+    display: block flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.15s;
+    user-select: none;
+}
+
+.paint_panel button:hover {
+    border-color: var(--light-gray3);
+}
+
+#button_class0.active {
+    background-color: var(--class-0);
+}
+
+#button_class1.active {
+    background-color: var(--class-1);
+}
+
+.class_select {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.button_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 8px 0;
+}
+
+#learn_button {
+    background-color: var(--card-background);
+    color: var(--card-border);
+    transition: 0.15s;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#learn_button:hover {
+    background-color: #dce8fc;
+}

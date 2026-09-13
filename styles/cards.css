@@ -1,0 +1,136 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    max-width: 1400px;
+    align-items: stretch;
+}
+
+/* Левая колонка с одной карточкой (70%) */
+.left-column {
+    flex: 0 0 70%;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Правая колонка с двумя карточками (30%) */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 0 0 30%;
+    height: 100%;
+    padding-right: 20px;
+}
+
+/* Общий стиль для карточек */
+.card {
+    background-color: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Шапка карточки с именем */
+.card-header {
+    background-color: var(--card-background);
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--card-border);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-icon-stroked {
+    stroke: var(--card-border);
+}
+
+.card-icon-filled {
+    fill: var(--card-border);
+}
+
+/* Тело карточки (содержимое) */
+.card-body {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    background-color: #fafbfc;
+    overflow: auto;
+}
+
+.card-centered {
+    overflow: none!important;
+    justify-content: center;
+    align-items: center;
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.dataset-card {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+/* Карточка в левой колонке */
+.left-column .card {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+/* Карточки в правой колонке */
+.right-column .card {
+    width: 100%;
+    min-height: 0;
+}
+
+.node-settings {
+    flex: 1;
+}
+
+@media (max-width: 750px) {
+    .left-column {
+        height: 50%;
+        flex: unset;
+    }
+
+    .right-column {
+        flex-direction: column;
+        height: 50%;
+        flex: unset;
+    }
+
+    .right-column .card {
+        height: auto;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .card-body {
+        padding: 12px;
+    }
+}

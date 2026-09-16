@@ -4,6 +4,7 @@ class DatasetViewer {
         this.axes = document.getElementById("dataset_axes");
         this.rects_container = document.getElementById("rects_container");
         this.lines_container = document.getElementById("lines_container");
+        this.glowing_container = document.getElementById("glowing");
         this.points_svg = document.getElementById("dataset_points");
         this.margin = {top: 10, right: 10, bottom: 40, left: 40};
         this.pointRadius = 3.5;
@@ -46,6 +47,11 @@ class DatasetViewer {
         this.lines_container.style.top = this.margin.top + "px";
         this.lines_container.style.width = this.graphWidth + "px";
         this.lines_container.style.height = this.graphHeight + "px";
+        
+        this.glowing_container.style.left = this.margin.left + "px";
+        this.glowing_container.style.top = this.margin.top + "px";
+        this.glowing_container.style.width = this.graphWidth + "px";
+        this.glowing_container.style.height = this.graphHeight + "px";
         
         this.points_svg.style.left = this.margin.left + "px";
         this.points_svg.style.top = this.margin.top + "px";
@@ -99,26 +105,19 @@ class DatasetViewer {
         };
         
         return `
-            <!-- Сетка -->
             ${gridLines()}
 
             <line x1="${this.margin.left}" y1="${this.margin.top}" x2="${this.width - this.margin.right}" y2="${this.margin.top}" stroke="#333" stroke-width="2"/>
             <line x1="${this.width - this.margin.right}" y1="${this.margin.top}" x2="${this.width - this.margin.right}" y2="${this.height - this.margin.bottom}" stroke="#333" stroke-width="2"/>
 
-            <!-- Ось X -->
             <line x1="${this.margin.left}" y1="${this.height - this.margin.bottom}" x2="${this.width - this.margin.right}" y2="${this.height - this.margin.bottom}" stroke="#333" stroke-width="2"/>
-            <!-- Подпись оси X -->
             <text x="${this.width - this.margin.right - this.graphWidth / 2}" y="${this.height - this.margin.bottom / 3}" font-family="Arial" font-size="13" font-weight="bold" fill="#333" text-anchor="middle">X</text>
 
-            <!-- Ось Y -->
             <line x1="${this.margin.left}" y1="${this.height - this.margin.bottom}" x2="${this.margin.left}" y2="${this.margin.top}" stroke="#333" stroke-width="2"/>
-            <!-- Подпись оси Y -->
             <text x="${this.margin.left / 3}" y="${this.margin.top + this.graphHeight / 2}" font-family="Arial" font-size="13" font-weight="bold" fill="#333"  text-anchor="middle">Y</text>
 
-            <!-- Деления X -->
             ${xTickMarks}
 
-            <!-- Деления Y -->
             ${yTickMarks}
         `;
     }
@@ -285,7 +284,10 @@ class DatasetViewer {
             var svgCode = `<svg id="line-${sep.id}" class="${className}" width="${4}" height="${h}" style="left: ${left}px; top: ${top}px;" xmlns="http://www.w3.org/2000/svg">`;
             svgCode += `<path d="M2 0 V ${h}" stroke="" stroke-dasharray="5,5"/>`
             svgCode += `</svg>`;
-            this.lines_container.innerHTML += svgCode;
+            if (sep.isMovable)
+                this.lines_container.innerHTML += svgCode;
+            else
+                this.glowing_container.innerHTML += svgCode;
 
             if (sep.isMovable) {
                 var line_elem = document.getElementById(`line-${sep.id}`);
@@ -315,7 +317,10 @@ class DatasetViewer {
             var svgCode = `<svg id="line-${sep.id}" class="${className}" height="${4}" width="${w}" style="left: ${left}px; top: ${top}px;" xmlns="http://www.w3.org/2000/svg">`;
             svgCode += `<path d="M0 2 H ${w}" stroke="" stroke-dasharray="5,5"/>`
             svgCode += `</svg>`;
-            this.lines_container.innerHTML += svgCode;
+            if (sep.isMovable)
+                this.lines_container.innerHTML += svgCode;
+            else
+                this.glowing_container.innerHTML += svgCode;
 
             if (sep.isMovable) {
                 var line_elem = document.getElementById(`line-${sep.id}`);
@@ -394,12 +399,6 @@ class DatasetViewer {
         this.movableId = -1;
     }
 
-    deleteLine() {
-        if (this.lineId != -1)
-            document.getElementById(`line-${this.lineId}`).remove();
-        this.lineId = -1;
-    }
-
     updateFillStyle(val) {
         this.fillStyle = val;
     }
@@ -461,6 +460,17 @@ class DatasetViewer {
             }
         }
         return [best_var, best_threshold];
+    }
+
+    deleteGlowing() {
+        this.glowing_container.innerHTML = "";
+    }
+
+    addGlowing(rect) {
+        var svgCode = `<svg width="${rect.w * this.graphWidth}" height="${rect.h * this.graphHeight}" style="left: ${this.getX_(rect.x)}; top: ${this.getY_(rect.y) - rect.h * this.graphHeight};" xmlns="http://www.w3.org/2000/svg">`;
+        svgCode += `<rect x="0" y="0" width="${rect.w * this.graphWidth}" height="${rect.h * this.graphHeight}" fill="none" stroke-width="10" stroke="black" opacity="0.6" stroke-dasharray="5,5">`;
+        svgCode += `</svg>`;
+        this.glowing_container.innerHTML = svgCode;
     }
 };
 

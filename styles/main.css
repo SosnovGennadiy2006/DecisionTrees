@@ -60,6 +60,11 @@ body {
     position: absolute;
 }
 
+#glowing {
+    position: absolute;
+    pointer-events: none;
+}
+
 #lines_container {
     pointer-events: none;
     position: absolute;

@@ -56,6 +56,7 @@ class BinaryTree extends EventTarget {
             var nodeRect = document.getElementById(`node-${node.id}`);
             var node_ = this.getNode(node.id);
             nodeRect.addEventListener('mouseenter', () => {
+                viewer.addGlowing(node_.rect);
                 if (!node_.isLeaf && this.selectedNodeId != node_.id) {
                     if (node_.variable == 'X') {
                         viewer.addLine(new Separator(node_.variable, node_.threshold, 0, 0, node_.getX1(), node_.getX2(), node_, false));
@@ -65,7 +66,7 @@ class BinaryTree extends EventTarget {
                 }
             });
             nodeRect.addEventListener('mouseleave', () => {
-                viewer.deleteLine();
+                viewer.deleteGlowing();
                 this.updateNodeSettings();
             });
         });
@@ -427,6 +428,8 @@ iconSelect.addEventListener("valueChanged", (e) => {
 });
 
 function updateScroll() {
+    viewer.deleteGlowing();
+    
     const wrapper = document.querySelector('.tree_wrapper');
     const tree_svg = wrapper.querySelector('svg');
 
